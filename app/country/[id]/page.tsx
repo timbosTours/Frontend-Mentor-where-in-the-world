@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 interface Country {
     flags: {
@@ -10,59 +11,73 @@ interface Country {
         common: string;
         official: string;
         nativeName: {
-            [key: string]: {
-                official: string;
-                common: string;
-            }
-        }
-    }
+        [key: string]: {
+            official: string;
+            common: string;
+        };
+        };
+    };
     population: number;
     capital: string;
     currencies: {
-            [code: string]: {
-                name: string;
-            };
+        [code: string]: {
+        name: string;
         };
-        languages: {
-            [code: string]: string;
-        };
-        borders: string[];
+    };
+    languages: {
+        iso639_1: string;
+        iso639_2: string;
+        name: string;
+        nativeName: string;
+    }[];
+    borders: string[];
     tld: string[];
     region: string;
     subregion: string;
-    }
+    cca3: string;
+}
 
 
-import { useState, useEffect } from 'react';
-
-export default function Country({ params }: {
-        params: { id: string };
-    }) {
-    const [data, setData] = useState<Country[]>([]);
+export default function Country({ params }: { params: { id:    string } }) {
+    const [country, setCountry] = useState<Country | null>(null);
+    const [borderCountries, setBorderCountries] = useState<Country[]>([]);
     const [isLoading, setLoading] = useState(false);
+    const [languageCode, setLanguageCode] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading(true);
         fetch(`https://restcountries.com/v3.1/name/${params.id}`)
         .then((res) => res.json())
         .then((data) => {
-            setData(data);
+            setCountry(data[0] || null);
+            setLanguageCode(data[0]?.languages[0]?.iso639_1 || null);
             setLoading(false);
-            console.log(data);
         });
-    }, []);
+    }, [params.id]);
+
+    useEffect(() => {
+        if (country && country.borders && country.borders.length > 0) {
+        const borderCodes = country.borders.join(',');
+        fetch(`https://restcountries.com/v3.1/alpha?codes=${encodeURIComponent(borderCodes)}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setBorderCountries(data);
+            });
+        }
+    }, [country]);
 
     if (isLoading) return <p>Loading...</p>;
-    if (!data) return <p>Could not load Country data</p>;
+    if (!country) return <p>Could not load Country data</p>;
 
-    return (
+return (
         <div>
-        {data.map((country: Country) => (
-            <div key={country.name.common}>
+            <Link href={'/'}>Back</Link>
+        <div>
             <img src={country.flags.svg} alt={`${country.name.common} Flag`} />
             <h2>{country.name.common}</h2>
-            <p>Native Name: {Object.entries(country.name.nativeName).map(([language, nativeName]) => (<span key={language}>{nativeName.official}</span>
-                ))}</p>
+            {country.name.nativeName && (
+        <p>Native Name: {country.name.nativeName[Object.keys(country.name.nativeName)[0]].official}</p>
+        )}
             <p>Population: {country.population}</p>
             <p>Region: {country.region}</p>
             <p>Subregion: {country.subregion}</p>
@@ -70,23 +85,21 @@ export default function Country({ params }: {
             <br />
             <p>Top Level Domain: {country.tld.join(', ')}</p>
             <p>Currencies: {Object.values(country.currencies).map((currency) => currency.name).join(', ')}</p>
-                <p>Languages: {Object.values(country.languages).join(', ')}</p>
+            <p>Languages: {Object.values(country.languages).join(', ')}</p>
             <br />
-            {country.borders && country.borders.length > 0 && (
+            {borderCountries.length > 0 && (
             <p>
-                Border Countries:{" "}
+                Border Countries:{' '}
                 <span>
-                {country.borders.map((border) => (
-                    <Link href={`/country/${border}`} key={border}>
-                    {border}
+                {borderCountries.map((borderCountry) => (
+                    <Link href={`/country/${borderCountry.name.common}`} key={borderCountry.cca3}>
+                    {borderCountry.name.common}
                     </Link>
                 ))}
                 </span>
             </p>
             )}
-
-            </div>
-        ))}
+        </div>
         </div>
     );
-    }
+}
