@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Country {
     flags: {
@@ -37,12 +38,12 @@ interface Country {
     cca3: string;
 }
 
-
-export default function Country({ params }: { params: { id:    string } }) {
+export default function Country({ params }: { params: { id: string } }) {
     const [country, setCountry] = useState<Country | null>(null);
     const [borderCountries, setBorderCountries] = useState<Country[]>([]);
     const [isLoading, setLoading] = useState(false);
-    const [languageCode, setLanguageCode] = useState<string | null>(null);
+    const router = useRouter();
+
 
     useEffect(() => {
         setLoading(true);
@@ -50,7 +51,6 @@ export default function Country({ params }: { params: { id:    string } }) {
         .then((res) => res.json())
         .then((data) => {
             setCountry(data[0] || null);
-            setLanguageCode(data[0]?.languages[0]?.iso639_1 || null);
             setLoading(false);
         });
     }, [params.id]);
@@ -61,7 +61,7 @@ export default function Country({ params }: { params: { id:    string } }) {
         fetch(`https://restcountries.com/v3.1/alpha?codes=${encodeURIComponent(borderCodes)}`)
             .then((res) => res.json())
             .then((data) => {
-                setBorderCountries(data);
+            setBorderCountries(data);
             });
         }
     }, [country]);
@@ -69,15 +69,15 @@ export default function Country({ params }: { params: { id:    string } }) {
     if (isLoading) return <p>Loading...</p>;
     if (!country) return <p>Could not load Country data</p>;
 
-return (
+    return (
         <div>
-            <Link href={'/'}>Back</Link>
+        <button onClick={() => {router.back()}}>Back</button>
         <div>
             <img src={country.flags.svg} alt={`${country.name.common} Flag`} />
             <h2>{country.name.common}</h2>
             {country.name.nativeName && (
-        <p>Native Name: {country.name.nativeName[Object.keys(country.name.nativeName)[0]].official}</p>
-        )}
+            <p>Native Name: {country.name.nativeName[Object.keys(country.name.nativeName)[0]].official}</p>
+            )}
             <p>Population: {country.population}</p>
             <p>Region: {country.region}</p>
             <p>Subregion: {country.subregion}</p>
