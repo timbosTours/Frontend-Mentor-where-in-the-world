@@ -14,6 +14,7 @@ interface Country {
   capital: string;
 }
 
+// Define regions for the dropdown filter
 const regions = [
   { label: 'Africa', value: 'africa' },
   { label: 'America', value: 'americas' },
@@ -23,6 +24,7 @@ const regions = [
 ];
 
 export default function Page() {
+  // State variables
   const [data, setData] = useState<Country[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,6 +33,7 @@ export default function Page() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Fetch data from API when the component mounts
   useEffect(() => {
     setLoading(true);
     fetch('https://restcountries.com/v3.1/all')
@@ -41,6 +44,7 @@ export default function Page() {
       });
   }, []);
 
+  // Filter data based on search query
   useEffect(() => {
     if (searchQuery.trim() !== '') {
       const filtered = data.filter((country) =>
@@ -52,15 +56,18 @@ export default function Page() {
     }
   }, [searchQuery, data]);
 
+   // Handle search input change
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
 
+  // Handle region selection in dropdown
   const handleRegionChange = (value: string) => {
     setSelectedRegion(value);
     setDropdownOpen(false);
   };
 
+  // Fetch data based on selected region
   useEffect(() => {
     if (selectedRegion) {
       setLoading(true);
@@ -73,16 +80,19 @@ export default function Page() {
     }
   }, [selectedRegion]);
 
+  // Handle dropdown button click
   const handleButtonClick = () => {
     setDropdownOpen(!isDropdownOpen);
   };
 
+  // Handle clicks outside the dropdown to close it
   const handleOutsideClick = (event: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
       setDropdownOpen(false);
     }
   };
 
+  // Attach event listener for outside clicks when the component mounts
   useEffect(() => {
     document.addEventListener('mousedown', handleOutsideClick);
 
@@ -91,7 +101,10 @@ export default function Page() {
     };
   }, []);
 
+  // Render loading state
   if (isLoading) return <p>Loading...</p>;
+
+  // Render error state if data couldn't be loaded
   if (!data) return <p>Could not load Country data</p>;
 
   return (

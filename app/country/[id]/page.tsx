@@ -39,12 +39,13 @@ interface Country {
 }
 
 export default function Country({ params }: { params: { id: string } }) {
+    // State variables
     const [country, setCountry] = useState<Country | null>(null);
     const [borderCountries, setBorderCountries] = useState<Country[]>([]);
     const [isLoading, setLoading] = useState(false);
     const router = useRouter();
 
-
+    // Fetch country data when the component mounts or when the ID parameter changes
     useEffect(() => {
         setLoading(true);
         fetch(`https://restcountries.com/v3.1/name/${params.id}`)
@@ -55,6 +56,7 @@ export default function Country({ params }: { params: { id: string } }) {
         });
     }, [params.id]);
 
+    // Fetch border countries data
     useEffect(() => {
         if (country && country.borders && country.borders.length > 0) {
         const borderCodes = country.borders.join(',');
@@ -66,13 +68,18 @@ export default function Country({ params }: { params: { id: string } }) {
         }
     }, [country]);
 
+    // Render loading state
     if (isLoading) return <p>Loading...</p>;
+
+    // Render error state if country data couldn't be loaded
     if (!country) return <p>Could not load Country data</p>;
 
     return (
         <div>
+        {/* Button to go back */}
         <button onClick={() => {router.back()}}>Back</button>
-        <div>
+            <div>
+            {/* Country information */}
             <img src={country.flags.svg} alt={`${country.name.common} Flag`} />
             <h2>{country.name.common}</h2>
             {country.name.nativeName && (
@@ -87,6 +94,7 @@ export default function Country({ params }: { params: { id: string } }) {
             <p>Currencies: {Object.values(country.currencies).map((currency) => currency.name).join(', ')}</p>
             <p>Languages: {Object.values(country.languages).join(', ')}</p>
             <br />
+            {/* Render border countries if available */}
             {borderCountries.length > 0 && (
             <p>
                 Border Countries:{' '}
