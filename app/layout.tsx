@@ -1,7 +1,6 @@
 import Header from '@/components/Header/Header'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import './styles/globals.css'
+import { ThemeProvider } from 'next-themes'
 
 export const metadata = {
   title: 'Where in the World?',
@@ -14,11 +13,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <ThemeProvider enableSystem={true} attribute="class">
+    <html className="min-w-screen min-h-screen bg-gray-100 dark:bg-blue-800" lang="en">
+      <body className="font-sans text-base text-gray-900">
         <Header/>
         {children}
       </body>
-    </html>
+      </html>
+    </ThemeProvider>
   )
 }

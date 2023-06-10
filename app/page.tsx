@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import './styles/globals.css';
 
 interface Country {
   flags: {
@@ -12,6 +13,7 @@ interface Country {
   };
   population: number;
   capital: string;
+  region: string;
 }
 
 // Define regions for the dropdown filter
@@ -56,7 +58,7 @@ export default function Page() {
     }
   }, [searchQuery, data]);
 
-   // Handle search input change
+  // Handle search input change
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
@@ -108,45 +110,72 @@ export default function Page() {
   if (!data) return <p>Could not load Country data</p>;
 
   return (
-    <div>
-      <div>
-        <input
-          type="text"
-          placeholder="Search country"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
+    <div className="p-4 ">
+      <div className="relative sm:my-4">
+      <div className="flex items-center bg-white rounded shadow sm:max-w-sm sm:h-10">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 600 600"
+    className="w-10 h-10 pl-6 fill-gray-400 flex-shrink-0"
+  >
+    <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+  </svg>
+  <input
+    type="text"
+    placeholder="Search for a country.."
+    value={searchQuery}
+    onChange={handleSearchChange}
+    className="flex-grow py-2 px-4 bg-transparent text-gray-900 rounded focus:outline-none ml-auto overflow-hidden text-sm font-thin"
+  />
+</div>
 
-        <div ref={dropdownRef} className="dropdown">
-          <button className="dropdown-button" onClick={handleButtonClick}>
-            Filter by Region
-          </button>
-          {isDropdownOpen && (
-            <div className="dropdown-menu">
-              {regions.map((region) => (
-                <button
-                  key={region.value}
-                  className="dropdown-menu-item"
-                  onClick={() => handleRegionChange(region.value)}
-                >
-                  {region.label}
-                </button>
-              ))}
-            </div>
-          )}
+
+      <div ref={dropdownRef} className="sm:absolute sm:right-0 mt-4 h-10 text-xs sm:my-0 sm:top-0">
+        <button
+          className="w-48 py-2.5 px-4 bg-white text-gray-900 text-sm font-light rounded shadow flex"
+          onClick={handleButtonClick}
+        >
+          Filter by Region
+          <svg className="w-3 h-3 ml-10 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>
+        </button>
+        {isDropdownOpen && (
+          <div className="absolute top-28 sm:top-11 w-48 bg-white border border-gray-300 shadow rounded z-10">
+            {regions.map((region) => (
+              <button
+                key={region.value}
+                className="block w-full py-2 px-4 text-left hover:bg-gray-100"
+                onClick={() => handleRegionChange(region.value)}
+              >
+                {region.label}
+              </button>
+            ))}
+          </div>
+        )}
         </div>
-      </div>
-
+        </div>
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 rounded pt-4">   
       {filteredData.map((country: Country) => (
-        <Link href={`/country/${country.name.common}`} key={country.name.common}>
+        <Link
+          href={`/country/${country.name.common}`}
+          key={country.name.common}
+          className="block mb-4 bg-white rounded shadow hover:shadow-md"
+        >
           <div>
-            <img src={country.flags.svg} alt={`${country.name.common} Flag`} />
-            <p>Name: {country.name.common}</p>
-            <p>Population: {country.population}</p>
-            <p>Capital: {country.capital}</p>
+            <img className="rounded-t" src={country.flags.svg} alt={`${country.name.common} Flag`} />
+            <div className="m-6">
+            <p className="text-gray-900 text-lg font-semibold mt-2">
+              {country.name.common}
+              </p>
+              <div className="my-6 mb-10s text-sm">
+                <p>Population: <span className="font-thin">{country.population}</span></p>
+                <p>Region: <span className="font-thin">{ country.region}</span></p>
+                <p>Capital: <span className="font-thin">{country.capital}</span></p>
+              </div>
+            </div>
           </div>
         </Link>
       ))}
+      </div>
     </div>
   );
 }
