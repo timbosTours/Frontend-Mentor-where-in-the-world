@@ -67,15 +67,7 @@ Got started with `create-next-app`. Worked on the pages and layout first, then o
 
 I learned how to make a dark theme with Tailwind and next-themes.
 
-I also learned how to navigate back through the previous pages with next/navigation;
-
-```<button
-        onClick={() => {
-        router.back();
-        }}
-        className="py-1.5 px-6 pl-2 my-4 mb-12 bg-white text-gray-900 rounded shadow-3xl flex text-sm font-thin dark:bg-gray-800 dark:text-white"
-    >```
-
+I also learned how to navigate back through the previous pages with next/navigation.
 
 
 ### Useful resources
