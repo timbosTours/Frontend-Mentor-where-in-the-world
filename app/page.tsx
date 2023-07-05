@@ -224,7 +224,7 @@ const handleResetFilter = () => {
         className="block mb-4 -mx-px bg-white rounded shadow hover:shadow-md dark:bg-gray-800 dark:text-white hover:scale-105 duration-300"
       >
         <div className="card flex flex-col justify-between h-full">
-          <img tabIndex={-1} className="rounded-t" src={country.flags.png} alt={`${country.name.common} Flag`} />
+          <img tabIndex={-1} className="rounded-t h-44 overflow-clip" src={country.flags.png} alt={`${country.name.common} Flag`} />
           <div className="textBox m-4">
             <p tabIndex={0} className="text-gray-900 text-lg font-semibold  dark:text-white">
               {country.name.common}
